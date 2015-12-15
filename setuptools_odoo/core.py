@@ -30,7 +30,9 @@ ODOO_VERSION_INFO = {
 }
 
 
-def _get_version(addon_dir, manifest):
+def get_version(addon_dir, manifest=None):
+    if manifest is None:
+        manifest = read_manifest(addon_dir)
     version = manifest.get('version')
     if not version:
         raise DistutilsSetupError("No version in manifest in %s" % addon_dir)
@@ -44,7 +46,7 @@ def _get_version(addon_dir, manifest):
                                   (odoo_version, addon_dir))
     odoo_version_info = ODOO_VERSION_INFO[odoo_version]
     version = get_git_postversion(addon_dir)
-    return version, odoo_version_info
+    return version, odoo_version, odoo_version_info
 
 
 def _get_description(addon_dir, manifest):
@@ -66,7 +68,7 @@ def make_pkg_name(addon_name):
 def make_pkg_requirement(addon_dir):
     manifest = read_manifest(addon_dir)
     addon_name = os.path.basename(addon_dir)
-    version, odoo_version_info = _get_version(addon_dir, manifest)
+    version, odoo_version, odoo_version_info = get_version(addon_dir, manifest)
     addon_dep_version = odoo_version_info['addon_dep_version']
     return make_pkg_name(addon_name) + addon_dep_version
 
@@ -94,7 +96,7 @@ def _get_install_requires(odoo_version_info, manifest, no_depends=[]):
 def get_install_requires_odoo_addon(addon_dir, no_depends=[]):
     """ Get the list of requirements for an addon """
     manifest = read_manifest(addon_dir)
-    version, odoo_version_info = _get_version(addon_dir, manifest)
+    version, odoo_version, odoo_version_info = get_version(addon_dir, manifest)
     return _get_install_requires(odoo_version_info, manifest, no_depends)
 
 
@@ -128,7 +130,7 @@ def prepare_odoo_addon():
         raise DistutilsSetupError('%s is not an installable Odoo addon' %
                                   addon_dir)
     manifest = read_manifest(addon_dir)
-    version, odoo_version_info = _get_version(addon_dir, manifest)
+    version, odoo_version, odoo_version_info = get_version(addon_dir, manifest)
     setup_keywords = {
         'name': make_pkg_name(addon_name),
         'version': version,
