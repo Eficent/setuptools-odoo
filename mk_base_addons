@@ -6,4 +6,4 @@ import os
 
 for d in sorted(os.listdir('.')):
     if os.path.isdir(d) and d != 'setup' and not d.startswith('.'):
-        print "    '{}',".format(d)
+        print("    '{}',".format(d))
